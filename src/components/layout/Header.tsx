@@ -187,16 +187,18 @@ export default function Header() {
             exit="closed"
             variants={menuVariants}
           >
-            {/* Background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-wood-darker via-wood-dark to-wood-darker" />
-            
-            {/* Subtle wood grain texture overlay */}
-            <div 
-              className="absolute inset-0 opacity-10"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-              }}
-            />
+            {/* Wood Background Image */}
+            <div className="absolute inset-0">
+              <Image
+                src="/images/hero/wood-bg.webp"
+                alt=""
+                fill
+                className="object-cover"
+                priority
+              />
+              {/* Dark overlay for text readability */}
+              <div className="absolute inset-0 bg-gradient-to-b from-wood-darker/90 via-wood-darker/85 to-wood-darker/90" />
+            </div>
 
             {/* Content */}
             <div className="relative h-full flex flex-col">

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronDown, ChefHat, DoorOpen, Armchair, TrendingUp, Hammer, Building2 } from 'lucide-react';
+import { ChevronDown, ChefHat, DoorOpen, Armchair, Stairs, Hammer, Building2 } from 'lucide-react';
 
 // Podaci o radovima
 const radovi = [
@@ -34,7 +34,7 @@ const usluge = [
     desc: 'Ormare, komode, police i drugi namještaj prema vašim željama.' 
   },
   { 
-    icon: TrendingUp, 
+    icon: Stairs, 
     title: 'Stepenice', 
     desc: 'Drvene stepenice - ravne, zavojite i konzolne.' 
   },

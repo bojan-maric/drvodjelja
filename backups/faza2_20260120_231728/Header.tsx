@@ -15,17 +15,9 @@ export default function Header() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
-    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // Zatvori menu kad se scrolla
-  useEffect(() => {
-    if (isScrolled && isMenuOpen) {
-      setIsMenuOpen(false);
-    }
-  }, [isScrolled]);
 
   const navigation = [
     { label: 'Početna', href: '/' },
@@ -38,17 +30,14 @@ export default function Header() {
   return (
     <header 
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         isScrolled 
-          ? 'bg-white shadow-lg' 
-          : 'bg-gradient-to-b from-black/60 via-black/30 to-transparent'
+          ? 'bg-white shadow-md py-2' 
+          : 'bg-transparent py-4'
       )}
     >
       <nav className="container mx-auto px-4">
-        <div className={cn(
-          'flex items-center justify-between transition-all duration-500',
-          isScrolled ? 'py-3' : 'py-5'
-        )}>
+        <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <Image 
@@ -57,10 +46,8 @@ export default function Header() {
               width={200} 
               height={80}
               className={cn(
-                'w-auto transition-all duration-300',
-                isScrolled 
-                  ? 'h-10 md:h-12' 
-                  : 'h-12 md:h-14 brightness-0 invert'
+                'h-10 md:h-12 w-auto transition-all duration-300',
+                !isScrolled && 'brightness-0 invert'
               )}
               priority
             />
@@ -85,10 +72,10 @@ export default function Header() {
             <a
               href="tel:+385XXXXXXXX"
               className={cn(
-                'flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-all',
+                'flex items-center gap-2 px-4 py-2 rounded-lg transition-all',
                 isScrolled 
                   ? 'bg-wood text-white hover:bg-wood-dark' 
-                  : 'bg-white/10 backdrop-blur-sm text-white border border-white/30 hover:bg-white/20'
+                  : 'bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30'
               )}
             >
               <Phone size={18} />
@@ -114,10 +101,10 @@ export default function Header() {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className={cn(
-            'md:hidden py-4 mb-4 rounded-xl shadow-xl',
+            'md:hidden py-4 mt-2 rounded-lg',
             isScrolled 
-              ? 'bg-white border border-gray-100' 
-              : 'bg-black/90 backdrop-blur-md border border-white/10'
+              ? 'bg-white border-t' 
+              : 'bg-black/80 backdrop-blur-md'
           )}>
             <div className="flex flex-col space-y-1 px-2">
               {navigation.map((item) => (
@@ -126,8 +113,8 @@ export default function Header() {
                   href={item.href}
                   className={cn(
                     'py-3 px-4 rounded-lg font-medium transition-colors',
-                    isScrolled
-                      ? 'text-gray-700 hover:text-wood hover:bg-wood-light/10'
+                    isScrolled 
+                      ? 'text-gray-600 hover:text-wood hover:bg-gray-50' 
                       : 'text-white hover:bg-white/10'
                   )}
                   onClick={() => setIsMenuOpen(false)}
@@ -137,7 +124,7 @@ export default function Header() {
               ))}
               <a
                 href="tel:+385XXXXXXXX"
-                className="flex items-center justify-center gap-2 bg-wood text-white px-4 py-3 rounded-lg hover:bg-wood-dark transition-colors mt-2 mx-2"
+                className="flex items-center justify-center gap-2 bg-wood text-white px-4 py-3 rounded-lg hover:bg-wood-dark transition-colors mt-2"
               >
                 <Phone size={18} />
                 <span>Nazovite nas</span>

@@ -3,7 +3,7 @@
 ## ✅ Završene faze
 - [x] **Faza 1: Kostur** - Chat 1
 - [x] **Faza 1.5: Slike + Logo** - Chat 1 (nastavak)
-- [ ] Faza 2: Javne stranice (kontakt forma, animacije)
+- [x] **Faza 2: Javne stranice** - Chat 2 ✅ NOVO
 - [ ] Faza 3: Galerija (filtriranje, lightbox)
 - [ ] Faza 4: Admin CMS
 - [ ] Faza 5: Polish + Deploy
@@ -27,25 +27,25 @@ drvodjelja/
 │   └── seed.ts
 │
 ├── public/
-│   ├── favicon.ico              ✅ NOVO
-│   ├── apple-touch-icon.png     ✅ NOVO
-│   ├── icon-192.png             ✅ NOVO
+│   ├── favicon.ico
+│   ├── apple-touch-icon.png
+│   ├── icon-192.png
 │   └── images/
 │       ├── logo/
-│       │   ├── logo.png         ✅ NOVO (za header)
-│       │   └── logo-full.png    ✅ NOVO (puni logo)
+│       │   ├── logo.png
+│       │   └── logo-full.png
 │       ├── hero/
-│       │   └── drvo_full.webp   ✅ NOVO
+│       │   ├── drvo_full.webp      (stari - ne koristi se)
+│       │   └── wood-bg.webp        ✅ NOVO (tekstura drva)
 │       └── radovi/
-│           ├── rad-1.jpg        ✅ NOVO
-│           ├── rad-2.jpg
+│           ├── rad-1.jpg
 │           ├── ...
-│           └── rad-14.jpg       (14 slika radova)
+│           └── rad-14.jpg
 │
 └── src/
     ├── app/
-    │   ├── layout.tsx          ✅ AŽURIRANO (favicon)
-    │   ├── page.tsx            ✅ AŽURIRANO (hero, galerija)
+    │   ├── layout.tsx              ✅ AŽURIRANO (bez pt-16)
+    │   ├── page.tsx                ✅ AŽURIRANO (Framer Motion + ContactForm)
     │   ├── globals.css
     │   │
     │   ├── admin/
@@ -55,17 +55,21 @@ drvodjelja/
     │   │       └── page.tsx
     │   │
     │   └── api/
-    │       └── auth/
-    │           └── [...nextauth]/
-    │               └── route.ts
+    │       ├── auth/
+    │       │   └── [...nextauth]/
+    │       │       └── route.ts
+    │       └── contact/
+    │           └── route.ts        ✅ NOVO
     │
     ├── components/
     │   ├── layout/
-    │   │   ├── Header.tsx      ✅ AŽURIRANO (logo slika)
-    │   │   └── Footer.tsx      ✅ AŽURIRANO (logo slika)
+    │   │   ├── Header.tsx          ✅ AŽURIRANO (transparentan)
+    │   │   └── Footer.tsx
+    │   ├── sections/
+    │   │   └── ContactForm.tsx     ✅ NOVO
     │   ├── providers/
     │   │   └── AuthProvider.tsx
-    │   └── index.ts
+    │   └── index.ts                ✅ AŽURIRANO
     │
     ├── lib/
     │   ├── prisma.ts
@@ -94,32 +98,35 @@ colors: {
 }
 ```
 
-### Logo
-- **Header:** `/images/logo/logo.png` (80px visine)
-- **Puni:** `/images/logo/logo-full.png` (400px širine)
-- **Favicon:** `/favicon.ico` (32x32)
+### Hero dizajn
+- **Pozadina:** `wood-bg.webp` - tekstura drva (lamperija)
+- **Overlay:** Gradient `from-black/40 via-black/30 to-black/50`
+- **Sadržaj:** STOLARSKA RADIONICA → DRVODJELJA (veliki) → logo (bijeli) → 30 godina → CTA
+- **Header:** Transparentan na vrhu, bijeli na scroll
 
 ---
 
-## 🖼️ Slike
+## 🔧 Faza 2 - Što je napravljeno
 
-### Radovi (14 slika)
-| Slika | Kategorija |
-|-------|------------|
-| rad-1.jpg | Kuhinja |
-| rad-2.jpg | Kuhinja |
-| rad-3.jpg | Kuhinja |
-| rad-4.jpg | Kuhinja |
-| rad-5.jpg | Kuhinja s pregradom |
-| rad-6.jpg | Namještaj |
-| rad-7.jpg | Kuhinja |
-| rad-8.jpg | Stolarija |
-| rad-9.jpg | Kuhinja |
-| rad-10.jpg | Kuhinja |
-| rad-11.jpg | Namještaj |
-| rad-12.jpg | Ostalo |
-| rad-13.jpg | Ostalo |
-| rad-14.jpg | Ostalo |
+### ✅ Hero redizajn
+- Nova pozadinska slika (wood-bg.webp)
+- Transparentan header s gradient pozadinom
+- Framer Motion animacije na hero sadržaju
+- Layout bez padding-top na main
+
+### ✅ Kontakt forma
+- Validacija (ime, email, poruka obavezni)
+- Dropdown za tip usluge
+- Loading/Success/Error states
+- POST na /api/contact → sprema u Inquiry model
+
+### ✅ Framer Motion animacije
+- fadeInUp, fadeIn, scaleIn, staggerContainer variants
+- whileInView animacije na svim sekcijama
+- Staggered animacije na grid elementima
+
+### ⏳ Nije implementirano (za kasnije)
+- Email notifikacije (Resend/Nodemailer)
 
 ---
 
@@ -129,38 +136,35 @@ colors: {
 |-------|----------|
 | admin@drvodjelja.hr | Drvodjelja2024! |
 
-⚠️ **PROMIJENI LOZINKU NAKON PRVOG LOGINA!**
-
 ---
 
-## 🔧 Sljedeća faza (Faza 2)
+## 🔧 Sljedeća faza (Faza 3)
 
-### Cilj: Kontakt forma + animacije
+### Cilj: Galerija stranica
 
 **Novi fileovi:**
-- `src/app/api/contact/route.ts` - API za kontakt formu
-- `src/components/sections/ContactForm.tsx` - Kontakt forma komponenta
+```
+src/app/galerija/
+├── page.tsx              # Grid svih radova s filterom
+└── [slug]/page.tsx       # Pojedinačni projekt
+
+src/components/gallery/
+├── GalleryGrid.tsx
+├── GalleryFilter.tsx
+└── Lightbox.tsx
+```
 
 **Zadaci:**
-1. Kontakt forma koja sprema u Inquiry model
-2. Framer Motion animacije na sekcijama
-3. Scroll efekti na hero
-4. Email notifikacija (Resend)
+1. /galerija stranica s filterom po kategorijama
+2. Lightbox za pregled slika
+3. Pojedinačna stranica projekta
+4. Lazy loading slika
 
 ---
 
-## ⚠️ Napomene
+## 📝 Odluke donesene u Fazi 2
 
-- **VL: Miljenko Bošnjak** - vlasnik Drvodjelje
-- Sve slike su optimizirane za web (max 1200px, quality 85%)
-- Hero slika je WebP format za bolju kompresiju
-- Logo u footeru ima `brightness-0 invert` za bijelu verziju
-
----
-
-## 📝 Odluke donesene
-
-1. Logo se koristi kao slika, ne tekst
-2. Hero sekcija koristi drvo_full.webp kao pozadinu
-3. Galerija prikazuje 8 slika na homepage-u
-4. Favicon je izveden iz loga (alati)
+1. Hero koristi wood-bg.webp (lamperija tekstura) umjesto drvo_full.webp
+2. Header je transparentan na vrhu s blagim gradientom
+3. Kontakt forma sprema u Inquiry model (email notifikacije za kasnije)
+4. Framer Motion koristi whileInView za scroll animacije

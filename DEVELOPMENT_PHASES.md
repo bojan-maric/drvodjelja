@@ -32,54 +32,45 @@ Projekt je podijeljen u 5 faza. Svaka faza = jedan chat = jedan deliverable.
 
 ---
 
-## 🔄 Faza 2: Javne stranice
-**Status:** SLJEDEĆA
+## ✅ Faza 2: Javne stranice
+**Status:** ZAVRŠENO
 
-**Planirano:**
+**Deliverables:**
 - Kontakt forma (POST /api/contact → Inquiry model)
-- Email notifikacije (Resend/Nodemailer)
 - Framer Motion animacije na sekcijama
 - Scroll efekti
-- Smooth scroll navigacija
-
-**Novi fileovi:**
-```
-src/
-├── app/api/contact/route.ts
-└── components/
-    └── sections/
-        └── ContactForm.tsx
-```
+- Hero redizajn s wood-bg.webp
+- Transparentan header
 
 ---
 
-## ⏳ Faza 3: Galerija
-**Status:** ČEKA
+## ✅ Faza 3: Galerija
+**Status:** ZAVRŠENO
 
-**Planirano:**
+**Deliverables:**
 - /galerija stranica
-- Filtriranje po kategorijama (kuhinje, vrata, namještaj, stepenice, ostalo)
-- Lightbox za slike
-- Pojedinačna stranica projekta (/galerija/[slug])
-- Lazy loading slika
+- GalleryFilter - animirani pills po kategorijama
+- GalleryGrid - responsive grid (2/3/4 kolone)
+- Lightbox - fullscreen + keyboard navigacija (←→Esc)
+- Header - full-screen mobile menu overlay
+- Framer Motion AnimatePresence za filter tranzicije
 
-**Novi fileovi:**
+**Kreirani fileovi:**
 ```
-src/app/
-├── galerija/
-│   ├── page.tsx
-│   └── [slug]/page.tsx
-└── components/
-    ├── gallery/
-    │   ├── GalleryGrid.tsx
-    │   ├── GalleryFilter.tsx
-    │   └── Lightbox.tsx
+src/app/galerija/
+└── page.tsx
+
+src/components/gallery/
+├── index.ts
+├── GalleryFilter.tsx
+├── GalleryGrid.tsx
+└── Lightbox.tsx
 ```
 
 ---
 
 ## ⏳ Faza 4: Admin CMS
-**Status:** ČEKA
+**Status:** SLJEDEĆA
 
 **Planirano:**
 - Dashboard sa statistikama
@@ -98,6 +89,13 @@ src/app/admin/
 ├── usluge/page.tsx
 ├── upiti/page.tsx
 └── postavke/page.tsx
+
+src/components/admin/
+├── Sidebar.tsx
+├── DashboardStats.tsx
+├── ProjectForm.tsx
+├── InquiryList.tsx
+└── ImageUpload.tsx
 ```
 
 ---
@@ -131,9 +129,9 @@ src/app/admin/
 |------|--------|----------|
 | Faza 1 | ✅ Završeno | 100% |
 | Faza 1.5 | ✅ Završeno | 100% |
-| Faza 2 | 🔄 Sljedeća | 0% |
-| Faza 3 | ⏳ Čeka | 0% |
-| Faza 4 | ⏳ Čeka | 0% |
+| Faza 2 | ✅ Završeno | 100% |
+| Faza 3 | ✅ Završeno | 100% |
+| Faza 4 | ⏳ Sljedeća | 0% |
 | Faza 5 | ⏳ Čeka | 0% |
 
-**Ukupno: ~35% završeno**
+**Ukupno: ~65% završeno**

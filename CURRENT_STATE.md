@@ -3,8 +3,8 @@
 ## ✅ Završene faze
 - [x] **Faza 1: Kostur** - Chat 1
 - [x] **Faza 1.5: Slike + Logo** - Chat 1 (nastavak)
-- [x] **Faza 2: Javne stranice** - Chat 2 ✅ NOVO
-- [ ] Faza 3: Galerija (filtriranje, lightbox)
+- [x] **Faza 2: Javne stranice** - Chat 2
+- [x] **Faza 3: Galerija** - Chat 3 ✅ NOVO
 - [ ] Faza 4: Admin CMS
 - [ ] Faza 5: Polish + Deploy
 
@@ -35,18 +35,18 @@ drvodjelja/
 │       │   ├── logo.png
 │       │   └── logo-full.png
 │       ├── hero/
-│       │   ├── drvo_full.webp      (stari - ne koristi se)
-│       │   └── wood-bg.webp        ✅ NOVO (tekstura drva)
+│       │   └── wood-bg.webp
 │       └── radovi/
-│           ├── rad-1.jpg
-│           ├── ...
-│           └── rad-14.jpg
+│           ├── rad-1.jpg ... rad-14.jpg
 │
 └── src/
     ├── app/
-    │   ├── layout.tsx              ✅ AŽURIRANO (bez pt-16)
-    │   ├── page.tsx                ✅ AŽURIRANO (Framer Motion + ContactForm)
+    │   ├── layout.tsx
+    │   ├── page.tsx
     │   ├── globals.css
+    │   │
+    │   ├── galerija/                 ✅ NOVO
+    │   │   └── page.tsx              # Filter + Grid + Lightbox
     │   │
     │   ├── admin/
     │   │   ├── layout.tsx
@@ -59,17 +59,22 @@ drvodjelja/
     │       │   └── [...nextauth]/
     │       │       └── route.ts
     │       └── contact/
-    │           └── route.ts        ✅ NOVO
+    │           └── route.ts
     │
     ├── components/
     │   ├── layout/
-    │   │   ├── Header.tsx          ✅ AŽURIRANO (transparentan)
+    │   │   ├── Header.tsx            ✅ AŽURIRANO (full-screen mobile menu)
     │   │   └── Footer.tsx
     │   ├── sections/
-    │   │   └── ContactForm.tsx     ✅ NOVO
+    │   │   └── ContactForm.tsx
+    │   ├── gallery/                  ✅ NOVO
+    │   │   ├── index.ts
+    │   │   ├── GalleryFilter.tsx     # Filter kategorija s animiranim pillom
+    │   │   ├── GalleryGrid.tsx       # Responsive grid s hover efektima
+    │   │   └── Lightbox.tsx          # Fullscreen pregled + navigacija
     │   ├── providers/
     │   │   └── AuthProvider.tsx
-    │   └── index.ts                ✅ AŽURIRANO
+    │   └── index.ts                  ✅ AŽURIRANO
     │
     ├── lib/
     │   ├── prisma.ts
@@ -98,35 +103,45 @@ colors: {
 }
 ```
 
-### Hero dizajn
-- **Pozadina:** `wood-bg.webp` - tekstura drva (lamperija)
-- **Overlay:** Gradient `from-black/40 via-black/30 to-black/50`
-- **Sadržaj:** STOLARSKA RADIONICA → DRVODJELJA (veliki) → logo (bijeli) → 30 godina → CTA
-- **Header:** Transparentan na vrhu, bijeli na scroll
+### Kategorije galerije
+```typescript
+const categories = [
+  { value: 'sve', label: 'Sve' },
+  { value: 'kuhinje', label: 'Kuhinje' },
+  { value: 'vrata', label: 'Vrata i prozori' },
+  { value: 'namjestaj', label: 'Namještaj' },
+  { value: 'stepenice', label: 'Stepenice' },
+  { value: 'ostalo', label: 'Ostalo' },
+];
+```
 
 ---
 
-## 🔧 Faza 2 - Što je napravljeno
+## 🔧 Faza 3 - Što je napravljeno
 
-### ✅ Hero redizajn
-- Nova pozadinska slika (wood-bg.webp)
-- Transparentan header s gradient pozadinom
-- Framer Motion animacije na hero sadržaju
-- Layout bez padding-top na main
+### ✅ Header - Full-screen mobile menu
+- Full-screen overlay s gradientom (wood-darker → wood-dark)
+- Framer Motion animacije (staggered fade-in)
+- Elegantan close button (krug, ne ružan X)
+- Body scroll lock kad je otvoren
+- Dodan "Galerija" link u navigaciju
 
-### ✅ Kontakt forma
-- Validacija (ime, email, poruka obavezni)
-- Dropdown za tip usluge
-- Loading/Success/Error states
-- POST na /api/contact → sprema u Inquiry model
+### ✅ Galerija stranica (/galerija)
+- Hero sekcija s naslovom
+- GalleryFilter - animirani pill koji prati aktivnu kategoriju
+- GalleryGrid - responsive grid (2/3/4 kolone)
+- Lightbox - fullscreen pregled s:
+  - Keyboard navigacija (← → Escape)
+  - Prev/Next buttoni
+  - Image counter i kategorija
+  - Smooth animacije
+- CTA sekcija na dnu
 
 ### ✅ Framer Motion animacije
-- fadeInUp, fadeIn, scaleIn, staggerContainer variants
-- whileInView animacije na svim sekcijama
-- Staggered animacije na grid elementima
-
-### ⏳ Nije implementirano (za kasnije)
-- Email notifikacije (Resend/Nodemailer)
+- Filter pill layoutId animacija
+- Grid AnimatePresence za filter tranzicije
+- Lightbox fade/scale animacije
+- Mobile menu staggered reveal
 
 ---
 
@@ -138,33 +153,43 @@ colors: {
 
 ---
 
-## 🔧 Sljedeća faza (Faza 3)
+## 🔧 Sljedeća faza (Faza 4)
 
-### Cilj: Galerija stranica
+### Cilj: Admin CMS
 
 **Novi fileovi:**
 ```
-src/app/galerija/
-├── page.tsx              # Grid svih radova s filterom
-└── [slug]/page.tsx       # Pojedinačni projekt
+src/app/admin/
+├── page.tsx              # Dashboard (statistike)
+├── projekti/
+│   ├── page.tsx          # Lista projekata
+│   ├── novi/page.tsx     # Kreiranje projekta
+│   └── [id]/page.tsx     # Editiranje projekta
+├── usluge/page.tsx       # CRUD usluga
+├── upiti/page.tsx        # Inbox upita
+└── postavke/page.tsx     # Site settings
 
-src/components/gallery/
-├── GalleryGrid.tsx
-├── GalleryFilter.tsx
-└── Lightbox.tsx
+src/components/admin/
+├── Sidebar.tsx
+├── DashboardStats.tsx
+├── ProjectForm.tsx
+├── InquiryList.tsx
+└── ImageUpload.tsx
 ```
 
 **Zadaci:**
-1. /galerija stranica s filterom po kategorijama
-2. Lightbox za pregled slika
-3. Pojedinačna stranica projekta
-4. Lazy loading slika
+1. Dashboard sa statistikama (broj projekata, upita, etc.)
+2. CRUD za Projekte (upload slika, kategorije)
+3. CRUD za Usluge
+4. Inbox za upite (status: new/replied/archived)
+5. Postavke stranice (kontakt info, radno vrijeme)
 
 ---
 
-## 📝 Odluke donesene u Fazi 2
+## 📝 Odluke donesene u Fazi 3
 
-1. Hero koristi wood-bg.webp (lamperija tekstura) umjesto drvo_full.webp
-2. Header je transparentan na vrhu s blagim gradientom
-3. Kontakt forma sprema u Inquiry model (email notifikacije za kasnije)
-4. Framer Motion koristi whileInView za scroll animacije
+1. Mobile menu je full-screen overlay (ne dropdown)
+2. Filter koristi Framer Motion layoutId za smooth pill animaciju
+3. Lightbox ima keyboard navigaciju (←→ Escape)
+4. Kategorije galerije su hardkodirane (za sada), kasnije će dolaziti iz baze
+5. Slike su trenutno statičke (/images/radovi/rad-X.jpg), Admin CMS će omogućiti upload

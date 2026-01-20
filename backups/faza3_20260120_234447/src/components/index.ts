@@ -7,9 +7,5 @@ export { default as Footer } from './layout/Footer';
 // Sections
 export { default as ContactForm } from './sections/ContactForm';
 
-// Gallery
-export { GalleryFilter, GalleryGrid, Lightbox } from './gallery';
-export type { Category } from './gallery';
-
 // Providers
 export { AuthProvider } from './providers/AuthProvider';

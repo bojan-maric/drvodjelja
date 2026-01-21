@@ -3,14 +3,22 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { Phone } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 export default function Header() {
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  // 🔐 Secret tap counter for admin access
+  const [tapCount, setTapCount] = useState(0);
+  const tapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const TAPS_REQUIRED = 5;
+  const TAP_TIMEOUT = 2000; // Reset after 2 seconds of no taps
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,6 +40,36 @@ export default function Header() {
       document.body.style.overflow = '';
     };
   }, [isMenuOpen]);
+
+  // 🔐 Handle secret tap on logo
+  const handleLogoTap = () => {
+    if (tapTimeoutRef.current) {
+      clearTimeout(tapTimeoutRef.current);
+    }
+
+    const newCount = tapCount + 1;
+    setTapCount(newCount);
+
+    if (newCount >= TAPS_REQUIRED) {
+      setTapCount(0);
+      setIsMenuOpen(false);
+      router.push('/admin');
+      return;
+    }
+
+    tapTimeoutRef.current = setTimeout(() => {
+      setTapCount(0);
+    }, TAP_TIMEOUT);
+  };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (tapTimeoutRef.current) {
+        clearTimeout(tapTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const navigation = [
     { label: 'Početna', href: '/' },
@@ -100,8 +138,11 @@ export default function Header() {
             'flex items-center justify-between transition-all duration-500',
             isScrolled ? 'py-3' : 'py-5'
           )}>
-            {/* Logo */}
-            <Link href="/" className="flex items-center">
+            {/* Logo - 5 taps = admin */}
+            <div 
+              onClick={handleLogoTap}
+              className="flex items-center cursor-pointer select-none"
+            >
               <Image 
                 src="/images/logo/logo.png" 
                 alt="Drvodjelja - 30 godina sa vama" 
@@ -114,8 +155,9 @@ export default function Header() {
                     : 'h-12 md:h-14 brightness-0 invert'
                 )}
                 priority
+                draggable={false}
               />
-            </Link>
+            </div>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
@@ -204,11 +246,13 @@ export default function Header() {
             <div className="relative h-full flex flex-col">
               {/* Header */}
               <div className="flex items-center justify-between px-6 py-5">
-                {/* Logo */}
+                {/* Logo - also tappable in mobile menu */}
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1, duration: 0.3 }}
+                  onClick={handleLogoTap}
+                  className="cursor-pointer select-none"
                 >
                   <Image 
                     src="/images/logo/logo.png" 
@@ -216,6 +260,7 @@ export default function Header() {
                     width={160} 
                     height={64}
                     className="h-12 w-auto brightness-0 invert"
+                    draggable={false}
                   />
                 </motion.div>
 

@@ -11,8 +11,7 @@ import {
   Loader2, 
   Upload, 
   X, 
-  Star, 
-  GripVertical,
+  Star,
   ImageIcon
 } from 'lucide-react';
 

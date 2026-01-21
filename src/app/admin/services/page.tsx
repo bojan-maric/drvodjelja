@@ -1,24 +1,20 @@
 // src/app/admin/services/page.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { 
   Plus, 
   Edit2, 
   Trash2, 
-  Loader2, 
-  GripVertical,
+  Loader2,
   Check,
   X,
-  ChefHat,
-  DoorOpen,
-  Sofa,
-  Stairs,
   Wrench,
-  Hammer,
   Save
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
+import { SimpleToast } from '@/components/ui/Toast';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 interface Service {
   id: string;
@@ -50,6 +46,13 @@ export default function ServicesPage() {
     icon: 'Wrench',
     active: true,
   });
+
+  // Delete state
+  const [deleteTarget, setDeleteTarget] = useState<Service | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  // Toast state
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
     fetchServices();
@@ -106,6 +109,7 @@ export default function ServicesPage() {
         if (res.ok) {
           const newService = await res.json();
           setServices([...services, newService]);
+          setToast({ message: 'Usluga uspješno dodana', type: 'success' });
         }
       } else if (editingId) {
         const res = await fetch(`/api/services/${editingId}`, {
@@ -116,26 +120,36 @@ export default function ServicesPage() {
         if (res.ok) {
           const updated = await res.json();
           setServices(services.map((s) => (s.id === editingId ? updated : s)));
+          setToast({ message: 'Usluga uspješno ažurirana', type: 'success' });
         }
       }
       handleCancel();
     } catch (error) {
       console.error('Save error:', error);
+      setToast({ message: 'Greška pri spremanju', type: 'error' });
     } finally {
       setSaving(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Jeste li sigurni da želite obrisati ovu uslugu?')) return;
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
 
+    setDeleting(true);
     try {
-      const res = await fetch(`/api/services/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/services/${deleteTarget.id}`, { method: 'DELETE' });
       if (res.ok) {
-        setServices(services.filter((s) => s.id !== id));
+        setServices(services.filter((s) => s.id !== deleteTarget.id));
+        setToast({ message: 'Usluga uspješno obrisana', type: 'success' });
+      } else {
+        setToast({ message: 'Greška pri brisanju', type: 'error' });
       }
     } catch (error) {
       console.error('Delete error:', error);
+      setToast({ message: 'Greška pri brisanju', type: 'error' });
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
     }
   };
 
@@ -149,6 +163,10 @@ export default function ServicesPage() {
       if (res.ok) {
         const updated = await res.json();
         setServices(services.map((s) => (s.id === service.id ? updated : s)));
+        setToast({ 
+          message: updated.active ? 'Usluga aktivirana' : 'Usluga deaktivirana', 
+          type: 'success' 
+        });
       }
     } catch (error) {
       console.error('Toggle error:', error);
@@ -160,6 +178,8 @@ export default function ServicesPage() {
     return Icon ? <Icon size={20} /> : <Wrench size={20} />;
   };
 
+  const handleCloseToast = useCallback(() => setToast(null), []);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -170,6 +190,28 @@ export default function ServicesPage() {
 
   return (
     <div>
+      {/* Toast Notification */}
+      {toast && (
+        <SimpleToast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={handleCloseToast}
+        />
+      )}
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={!!deleteTarget}
+        title="Obriši uslugu"
+        message={`Jeste li sigurni da želite obrisati uslugu "${deleteTarget?.name}"?`}
+        confirmText="Obriši"
+        cancelText="Odustani"
+        variant="danger"
+        loading={deleting}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeleteTarget(null)}
+      />
+
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Usluge</h1>
@@ -365,7 +407,7 @@ export default function ServicesPage() {
                         <Edit2 size={18} />
                       </button>
                       <button
-                        onClick={() => handleDelete(service.id)}
+                        onClick={() => setDeleteTarget(service)}
                         className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Obriši"
                       >

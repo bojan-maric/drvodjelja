@@ -1,7 +1,7 @@
 // src/app/admin/projects/page.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
@@ -14,6 +14,8 @@ import {
   Loader2,
   Filter
 } from 'lucide-react';
+import { SimpleToast } from '@/components/ui/Toast';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 interface Project {
   id: string;
@@ -49,7 +51,13 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
-  const [deleteId, setDeleteId] = useState<string | null>(null);
+  
+  // Delete state
+  const [deleteTarget, setDeleteTarget] = useState<Project | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  
+  // Toast state
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
     fetchProjects();
@@ -69,24 +77,28 @@ export default function ProjectsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Jeste li sigurni da želite obrisati ovaj projekt?')) return;
-
-    setDeleteId(id);
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    
+    setDeleting(true);
     try {
-      const res = await fetch(`/api/projects/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/projects/${deleteTarget.id}`, { method: 'DELETE' });
       if (res.ok) {
-        setProjects(projects.filter((p) => p.id !== id));
+        setProjects(projects.filter((p) => p.id !== deleteTarget.id));
+        setToast({ message: 'Projekt uspješno obrisan', type: 'success' });
       } else {
-        alert('Greška pri brisanju projekta');
+        setToast({ message: 'Greška pri brisanju projekta', type: 'error' });
       }
     } catch (error) {
       console.error('Delete error:', error);
-      alert('Greška pri brisanju projekta');
+      setToast({ message: 'Greška pri brisanju projekta', type: 'error' });
     } finally {
-      setDeleteId(null);
+      setDeleting(false);
+      setDeleteTarget(null);
     }
   };
+
+  const handleCloseToast = useCallback(() => setToast(null), []);
 
   const filteredProjects = projects.filter((project) => {
     const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -109,6 +121,28 @@ export default function ProjectsPage() {
 
   return (
     <div>
+      {/* Toast Notification */}
+      {toast && (
+        <SimpleToast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={handleCloseToast}
+        />
+      )}
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={!!deleteTarget}
+        title="Obriši projekt"
+        message={`Jeste li sigurni da želite obrisati "${deleteTarget?.title}"? Ova akcija je nepovratna.`}
+        confirmText="Obriši"
+        cancelText="Odustani"
+        variant="danger"
+        loading={deleting}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeleteTarget(null)}
+      />
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Projekti</h1>
@@ -231,15 +265,10 @@ export default function ProjectsPage() {
                     Uredi
                   </Link>
                   <button
-                    onClick={() => handleDelete(project.id)}
-                    disabled={deleteId === project.id}
-                    className="flex-1 inline-flex items-center justify-center gap-2 text-sm text-red-600 hover:text-red-700 py-2 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+                    onClick={() => setDeleteTarget(project)}
+                    className="flex-1 inline-flex items-center justify-center gap-2 text-sm text-red-600 hover:text-red-700 py-2 rounded-lg hover:bg-red-50 transition-colors"
                   >
-                    {deleteId === project.id ? (
-                      <Loader2 size={16} className="animate-spin" />
-                    ) : (
-                      <Trash2 size={16} />
-                    )}
+                    <Trash2 size={16} />
                     Obriši
                   </button>
                 </div>

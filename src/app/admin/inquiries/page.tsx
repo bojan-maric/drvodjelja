@@ -1,24 +1,23 @@
 // src/app/admin/inquiries/page.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { 
   Mail, 
-  User, 
   Phone, 
   Calendar,
-  Clock,
   Loader2,
   Inbox,
   CheckCircle,
   Archive,
   Trash2,
-  ChevronRight,
   X,
   ExternalLink,
   Filter
 } from 'lucide-react';
+import { SimpleToast } from '@/components/ui/Toast';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 interface Inquiry {
   id: string;
@@ -44,7 +43,13 @@ export default function InquiriesPage() {
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('');
-  const [deleting, setDeleting] = useState<string | null>(null);
+  
+  // Delete state
+  const [deleteTarget, setDeleteTarget] = useState<Inquiry | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  // Toast state
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
     fetchInquiries();
@@ -81,26 +86,33 @@ export default function InquiriesPage() {
       if (res.ok) {
         const updated = await res.json();
         setInquiries(inquiries.map((i) => (i.id === id ? updated : i)));
+        setToast({ message: `Status promijenjen u "${statusLabels[status].label}"`, type: 'success' });
       }
     } catch (error) {
       console.error('Update error:', error);
+      setToast({ message: 'Greška pri ažuriranju statusa', type: 'error' });
     }
   };
 
-  const deleteInquiry = async (id: string) => {
-    if (!confirm('Jeste li sigurni da želite obrisati ovaj upit?')) return;
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
 
-    setDeleting(id);
+    setDeleting(true);
     try {
-      const res = await fetch(`/api/inquiries/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/inquiries/${deleteTarget.id}`, { method: 'DELETE' });
       if (res.ok) {
-        setInquiries(inquiries.filter((i) => i.id !== id));
-        if (selectedId === id) setSelectedId(null);
+        setInquiries(inquiries.filter((i) => i.id !== deleteTarget.id));
+        if (selectedId === deleteTarget.id) setSelectedId(null);
+        setToast({ message: 'Upit uspješno obrisan', type: 'success' });
+      } else {
+        setToast({ message: 'Greška pri brisanju upita', type: 'error' });
       }
     } catch (error) {
       console.error('Delete error:', error);
+      setToast({ message: 'Greška pri brisanju upita', type: 'error' });
     } finally {
-      setDeleting(null);
+      setDeleting(false);
+      setDeleteTarget(null);
     }
   };
 
@@ -129,6 +141,8 @@ export default function InquiriesPage() {
     return date.toLocaleDateString('hr-HR');
   };
 
+  const handleCloseToast = useCallback(() => setToast(null), []);
+
   const filteredInquiries = inquiries.filter((inquiry) => {
     if (!filter) return true;
     return inquiry.status === filter;
@@ -148,6 +162,28 @@ export default function InquiriesPage() {
 
   return (
     <div>
+      {/* Toast Notification */}
+      {toast && (
+        <SimpleToast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={handleCloseToast}
+        />
+      )}
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={!!deleteTarget}
+        title="Obriši upit"
+        message={`Jeste li sigurni da želite obrisati upit od "${deleteTarget?.name}"?`}
+        confirmText="Obriši"
+        cancelText="Odustani"
+        variant="danger"
+        loading={deleting}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeleteTarget(null)}
+      />
+
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Upiti</h1>
@@ -359,15 +395,10 @@ export default function InquiriesPage() {
                     </button>
                   )}
                   <button
-                    onClick={() => deleteInquiry(selectedInquiry.id)}
-                    disabled={deleting === selectedInquiry.id}
-                    className="inline-flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors ml-auto disabled:opacity-50"
+                    onClick={() => setDeleteTarget(selectedInquiry)}
+                    className="inline-flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors ml-auto"
                   >
-                    {deleting === selectedInquiry.id ? (
-                      <Loader2 size={18} className="animate-spin" />
-                    ) : (
-                      <Trash2 size={18} />
-                    )}
+                    <Trash2 size={18} />
                     Obriši
                   </button>
                 </div>

@@ -3,7 +3,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { Header, Footer } from '@/components';
+import LayoutWrapper from '@/components/layout/LayoutWrapper';
 
 const inter = Inter({ subsets: ['latin', 'latin-ext'] });
 
@@ -33,11 +33,9 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
       </head>
       <body className={inter.className}>
-        <Header />
-        <main className="min-h-screen">
+        <LayoutWrapper>
           {children}
-        </main>
-        <Footer />
+        </LayoutWrapper>
       </body>
     </html>
   );
